@@ -23,7 +23,7 @@ class Controls(NamedTuple):
     :param adapt_min_batch: minimum adaptation window to be reached before terminating burn-in algorithm
     :param adapt_smoother: ['beta'] regularization parameter for the proposal covariance. higher values result in more smoothing
     :param adapt_target: targeted acceptance probability. higher values result in smaller step sizes
-    :param adapt_thresh: ['b_acc'] burn-in algorithm termination criterion. values closer to 1 result in longer burn-in time, larger values in shorter burn-in time.
+    :param adapt_thresh: ['b_acc'] burn-in algorithm termination criterion. values closer to 1 result in longer burn-in time, larger values in shorter burn-in time
     :param jump_prob: probability of attempting a jump move at each iteration
     :param jump_kern_df: degrees of freedom of components in augmented model
     :param jump_weight_lb: ['epsilon_w'] lower bound of component weight in augmented model
@@ -36,7 +36,7 @@ class Controls(NamedTuple):
     adapt_min_batch: int = 100
     adapt_smoother: float = 1e-4
     adapt_target: float = .234
-    adapt_thresh: float = 1.25
+    adapt_thresh: float = 1.125
     jump_prob: float = .1
     jump_kern_df: float = 7
     jump_weight_lb: float = 1e-2
@@ -128,12 +128,12 @@ def update_globally(
     """
 
     i_prime = rng.choice([i for i in range(len(samplers)) if i != i_nil])
-    x_prime = samplers[i_prime].prop_mean + samplers[i_prime].cf_prop_cov @ np.linalg.solve(samplers[i_nil].cf_prop_cov, x_nil - samplers[i_nil].mean)
+    x_prime = samplers[i_prime].mean + samplers[i_prime].cf_cov @ np.linalg.solve(samplers[i_nil].cf_cov, x_nil - samplers[i_nil].mean)
     log_joint_nil = eval_joint(x_nil, i_nil, eval_logp, eval_d_logp, samplers, ctrl)
     log_joint_prime = eval_joint(x_prime, i_prime, eval_logp, eval_d_logp, samplers, ctrl)
     # change of variable adjustments correspond to diagonal of cholesky factors
-    log_jac_nil = np.sum(np.log(np.diag(samplers[i_nil].cf_prop_cov)))
-    log_jac_prime = np.sum(np.log(np.diag(samplers[i_prime].cf_prop_cov))) 
+    log_jac_nil = np.sum(np.log(np.diag(samplers[i_nil].cf_cov)))
+    log_jac_prime = np.sum(np.log(np.diag(samplers[i_prime].cf_cov))) 
     log_acc_prob = min(0, log_joint_prime - log_joint_nil + log_jac_prime - log_jac_nil)
     if np.log(rng.uniform()) < log_acc_prob:
         return x_prime, i_prime
