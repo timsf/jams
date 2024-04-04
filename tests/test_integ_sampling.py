@@ -25,8 +25,8 @@ def test_acquisition():
     ctrl = jams.sampling.Controls()
     modes, _ = jams.sampling.acquire_modes(eval_logp, eval_d_logp, starting_points, ctrl)
     assert len(modes) == 2
-    assert np.all(np.isclose(mu * np.sign(modes[0]), modes[0]))
-    assert np.all(np.isclose(mu * np.sign(modes[1]), modes[1]))
+    assert np.all(np.isclose(mu, modes[0]))
+    assert np.all(np.isclose(-mu, modes[1]))
 
 def test_sampling():
     def eval_logp(x):
@@ -41,9 +41,9 @@ def test_sampling():
     sig2 = sig1 / 2
     rng = np.random.default_rng(0)
     starting_points = rng.standard_normal(size=(32, d))
-    sampler = jams.sampling.sample_posterior(eval_logp, eval_d_logp, starting_points)
+    sampler = jams.sampling.sample_posterior(eval_logp, eval_d_logp, starting_points, rng=rng)
     samples = [next(sampler) for _ in range(int(1e5))]
     x, i = (np.array(a) for a in zip(*samples[int(1e4):]))
     assert isclose(.5, np.mean(i), rel_tol=1e-2)
-    assert np.all(np.isclose(mu * np.sign(x[i == 0].mean(0)), x[i == 0].mean(0), rtol=1e-2))
-    assert np.all(np.isclose(mu * np.sign(x[i == 1].mean(0)), x[i == 1].mean(0), rtol=1e-2))
+    assert np.all(np.isclose(mu, x[i == 0].mean(0), rtol=1e-2))
+    assert np.all(np.isclose(-mu, x[i == 1].mean(0), rtol=1e-2))
