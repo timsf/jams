@@ -1,19 +1,25 @@
 [tool.poetry]
 name = "jams"
 version = "0.1.0"
-description = ""
-authors = ["tim.sf <timstf@gmail.com>"]
+description = "Implementation of the JAMS algorithm for sampling of multimodal Bayesian posteriors"
+authors = ["Timothee Stumpf-Fetizon <timstf@gmail.com>"]
 readme = "README.md"
+repository = "https://github.com/timsf/jams"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-numpy = "^1.26.4"
-scipy = "^1.12.0"
-networkx = "^3.2.1"
-matplotlib = "^3.8.3"
-pytest = "^8.1.1"
 jupyter = "^1.0.0"
+matplotlib = "^3.8.3"
+networkx = "^3.2.1"
+numpy = "^1.26.4"
 pandas = "^2.2.1"
+pytest = "^8.1.1"
+scipy = "^1.12.0"
 
 [build-system]
 requires = ["poetry-core"]
