@@ -18,7 +18,7 @@ class Controls(NamedTuple):
     Tuning parameter collection.
 
     :param acq_thresh: ['epsilon'] distance threshold below which similar mode candidates are merged during mode acquisition
-    :param adapt_decay: rate at which the learning rate of the algorithm recedes. higher values stop adaptation more quickly
+    :param adapt_decay ['alpha']: rate at which the learning rate of the algorithm recedes. higher values stop adaptation more quickly
     :param adapt_dilation: rate at which adaptation windows grow. the proposal is adapted more rarely for higher values
     :param adapt_min_batch: minimum adaptation window to be reached before terminating burn-in algorithm
     :param adapt_smoother: ['beta'] regularization parameter for the proposal covariance. higher values result in more smoothing
@@ -31,12 +31,12 @@ class Controls(NamedTuple):
     """
 
     acq_thresh: float = .1
-    adapt_decay: float = .25
+    adapt_decay: float = .66
     adapt_dilation: float = 1
     adapt_min_batch: int = 100
     adapt_smoother: float = 1e-4
     adapt_target: float = .234
-    adapt_thresh: float = 1.125
+    adapt_thresh: float = 1.01
     jump_prob: float = .1
     jump_kern_df: float = 7
     jump_weight_lb: float = 1e-2
@@ -200,7 +200,7 @@ def warm_up(
             samplers[i].burnin = samplers[i].iter
             if samplers[i].epochs[-2] == samplers[i].iter:
                 # check that at least one move has been accepted
-                if np.any(x[i] != samplers[i].mean) and samplers[1].epochs[-1] - samplers[1].epochs[-2] > ctrl.adapt_min_batch:
+                if np.any(x[i] != samplers[i].mean) and samplers[i].epochs[-1] - samplers[i].epochs[-2] > ctrl.adapt_min_batch:
                     inhomo[i] = jams.helpers.eval_inhomo(samplers[i].cov, lagged_cov[i])
                 lagged_cov[i] = samplers[i].cov
         if max(inhomo) < ctrl.adapt_thresh:

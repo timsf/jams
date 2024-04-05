@@ -24,7 +24,7 @@ class AdaptiveProposal(object):
         self, 
         mean: FloatArr,
         cov: FloatArr,
-        adapt_decay: float = .25,
+        adapt_decay: float = .5,
         adapt_dilation: int = 1,
         adapt_smoother: float = 1e-3,
         adapt_target: float = .234,
@@ -35,10 +35,9 @@ class AdaptiveProposal(object):
         self.adapt_decay = adapt_decay
         self.adapt_dilation = adapt_dilation
         self.adapt_smoother = adapt_smoother
-        self.adapt_target = adapt_target
-
+        self.adapt_target = self.emp_prob = adapt_target
         self.cf_cov = np.linalg.cholesky(self.cov)
-        self.log_step_size = [0]
+        self.log_step_size = self._running_log_step_size = 0
         self.emp_prob = [0.0]
         self.epochs = [0, 1]
         self.iter = 0
@@ -56,7 +55,7 @@ class AdaptiveProposal(object):
         """
         
         if est_step_size:
-            scale = np.exp(self.log_step_size[-1] * 2)
+            scale = np.exp(self.log_step_size * 2)
         else:
             scale = (2.38 ** 2 / len(state))
         return jams.helpers.sample_cf_mvstud(state, np.sqrt(scale) * self.cf_cov, df, rng)
@@ -73,7 +72,7 @@ class AdaptiveProposal(object):
         """
         
         if est_step_size:
-            scale = np.exp(self.log_step_size[-1] * 2)
+            scale = np.exp(self.log_step_size * 2)
         else:
             scale = (2.38 ** 2 / len(state))
         return jams.helpers.eval_cf_mvstud(state, prop, np.sqrt(scale) * self.cf_cov, df)
@@ -82,7 +81,7 @@ class AdaptiveProposal(object):
         """
         Evaluate the approximating t-density to the target.
 
-        :param state: value at which to evaluate density
+        :param val: value at which to evaluate density
         :param df: degrees of freedom of t-distribution (set to np.inf for multivariate Gaussian)
         :return: log approximating density
         """
@@ -98,13 +97,14 @@ class AdaptiveProposal(object):
         """
 
         self.iter += 1
+        learning_rate = 1 / self.iter ** self.adapt_decay
         self.emp_prob[-1] = ((self.iter - self.epochs[-2] - 1) * self.emp_prob[-1] + acc_prob) / (self.iter - self.epochs[-2])
         # do not adapt mean
-        _, self._running_cov = jams.helpers.seq_update_moments(state, 1 + len(self.emp_prob), self._running_mean, self._running_cov)
+        _, self._running_cov = jams.helpers.seq_update_moments(state, 1 / learning_rate, self._running_mean, self._running_cov)
+        self._running_log_step_size = self._running_log_step_size + (acc_prob - self.adapt_target) * learning_rate
         if self.iter == self.epochs[-1]:
-            learning_rate = 1 / (len(self.epochs) ** self.adapt_decay)
-            self.log_step_size.append(self.log_step_size[-1] + learning_rate * (self.emp_prob[-1] - self.adapt_target))
             self.epochs.append(self.epochs[-1] + len(self.epochs) ** self.adapt_dilation)
             self.emp_prob.append(0.0)
             self.mean, self.cov = self._running_mean, self._running_cov
+            self.log_step_size = self._running_log_step_size
             self.cf_cov = np.linalg.cholesky(self.cov + self.adapt_smoother * np.identity(len(state)))
