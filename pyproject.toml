@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "jams"
 version = "0.1.0"
-description = "Implementation of the JAMS algorithm for sampling of multimodal Bayesian posteriors"
+description = "Implementation of the JAMS algorithm for sampling of multimodal probability distributions"
 authors = ["Timothee Stumpf-Fetizon <timstf@gmail.com>"]
 readme = "README.md"
 repository = "https://github.com/timsf/jams"
