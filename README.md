@@ -34,7 +34,7 @@ Implementation of the JAMS algorithm for sampling of multimodal probability dist
 
 Consult `demos/mixture.ipynb` for a working example. You can run Jupyter within the virtual environment by invoking
 
-    ```shell
+    ```bash
     uv run jupyter notebook
     ```
 
