@@ -21,7 +21,7 @@ Implementation of the JAMS algorithm for sampling of multimodal probability dist
 
 3. Set up the virtual environment:
 
-    ```shell
+    ```bash
     uv sync
     ```
 
