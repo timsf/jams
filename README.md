@@ -2,9 +2,15 @@
 
 Implementation of the JAMS algorithm for sampling of multimodal probability distributions, described in https://arxiv.org/abs/1812.02609. Used to conduct computer experiments reported in https://arxiv.org/abs/2501.05908. Consult the references at the bottom of the README for further information on the algorithm.
 
+    .
+    ├── demos   # Demonstration notebooks for a selection of models
+    ├── tests   # Test root
+    └── jams    # Code root
+
+
 ## Installation
 
-0. Install the dependencies: `Python 3.11`, `uv`, `git`:
+0. Install the generic dependencies `Python >= 3.11`, `uv`, `git`.
 
 1. Define your project root (`[project]`) and navigate there:
 
@@ -15,15 +21,16 @@ Implementation of the JAMS algorithm for sampling of multimodal probability dist
 
 2. Download the project files by cloning the repository:
 
-    ```bash
+    ```shell
     git clone https://github.com/timsf/jams.git
     ```
 
 3. Set up the virtual environment:
 
-    ```bash
+    ```shell
     uv sync
     ```
+
 
 ## Usage
 
@@ -34,9 +41,10 @@ Implementation of the JAMS algorithm for sampling of multimodal probability dist
 
 Consult `demos/mixture.ipynb` for a working example. You can run Jupyter within the virtual environment by invoking
 
-    ```bash
+    ```shell
     uv run jupyter notebook
     ```
+
 
 ## References
 
