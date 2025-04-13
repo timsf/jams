@@ -48,7 +48,7 @@ def sample_posterior(
     eval_d_logp: Callable[[FloatArr], FloatArr],
     starting_points: FloatArr,
     ctrl: Controls | None = Controls(),
-    rng: np.random.Generator = np.random.default_rng(),
+    rng: np.random.Generator = np.random.default_rng(0),
 ) -> Iterator[tuple[FloatArr, float]]:
     
     """
